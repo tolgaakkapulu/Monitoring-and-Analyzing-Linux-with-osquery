@@ -31,7 +31,6 @@ Actions to be taken to monitor and analyze Linux with osquery:
 - The logs are displayed in the directory below.
    - tail -f /var/log/osquery/osqueryd.results.log
 
-
 <b>Sample Query and Log Outputs</b>
    - <b>proccesses_monitoring:</b> SELECT *, ROUND(( (user_time + system_time) / (cpu_time.tsb - cpu_time.itsb)) * 100, 2) AS cpu_usage FROM processes, (SELECT (  SUM(user) + SUM(nice) + SUM(system) + SUM(idle) * 1.0) AS tsb,  SUM(COALESCE(idle, 0)) + SUM(COALESCE(iowait, 0)) AS itsb  FROM cpu_time) AS cpu_time;
       - {"name":"proccesses_monitoring","hostIdentifier":"osquery-host","calendarTime":"Thu Nov 19 07:52:15 2020 UTC","unixTime":1605772335,"epoch":0,"counter":999,"numerics":false,"columns":{"cmdline":"/usr/sbin/NetworkManager --no-daemon","cpu_usage":"0.48999999999999999","cwd":"/","disk_bytes_read":"4367360","disk_bytes_written":"3448832","egid":"0","euid":"0","gid":"0","itsb":"75202416","name":"NetworkManager","nice":"0","on_disk":"0","parent":"1","path":"/usr/sbin/NetworkManager","pgroup":"815","pid":"815","resident_size":"14692000","root":"/","sgid":"0","start_time":"1605520669","state":"S","suid":"0","system_time":"61980","threads":"3","total_size":"600536000","tsb":"99375244.0","uid":"0","user_time":"55580","wired_size":"0"},"action":"added"}
@@ -68,3 +67,12 @@ Actions to be taken to monitor and analyze Linux with osquery:
    - <b>shadow_monitoring:</b> <u>SELECT * FROM shadow WHERE password_status='active';</u>
       - {"name":"shadow_monitoring","hostIdentifier":"osquery-host","calendarTime":"Fri Nov 20 12:51:03 2020 UTC","unixTime":1605876663,"epoch":0,"counter":1,"numerics":false,"columns":{"expire":"-1","flag":"","hash_alg":"6","inactive":"-1","last_change":"18585","max":"99999","min":"0","password_status":"active","username":"root","warning":"7"},"action":"removed"}
 	  - {"name":"shadow_monitoring","hostIdentifier":"osquery-host","calendarTime":"Fri Nov 20 12:51:03 2020 UTC","unixTime":1605876663,"epoch":0,"counter":1,"numerics":false,"columns":{"expire":"-1","flag":"","hash_alg":"6","inactive":"-1","last_change":"18586","max":"99999","min":"0","password_status":"active","username":"root","warning":"7"},"action":"added"
+
+<b>Write to file or syslog</b>
+- <b>"logger_plugin": "syslog" :</b> It only allows it to be written into syslog.
+- <b>"logger_plugin": "filesystem" :</b> It only allows writing to the file directory.
+- <b>"logger_plugin": "filesystem,syslog" :</b> It allows to be written into both the file and syslog.
+
+<b>Forwarding osquery logs with Rsyslog</b>
+- :programname, isequal, "osqueryd"       @X.X.X.X:514   //UDP
+- :programname, isequal, "osqueryd"       @@X.X.X.X:514  //TCP
